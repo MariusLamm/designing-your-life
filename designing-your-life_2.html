@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive concept map of Designing Your Life by Bill Burnett and Dave Evans — with exercises for every concept.">
+<meta property="og:title" content="Designing Your Life — Concept Map + Exercises">
+<meta property="og:description" content="17 key concepts from Burnett & Evans, each with a full explanation, illustration, and practical exercise.">
+<title>Designing Your Life — Concept Map</title>
+<style>
+  :root {
+    --bg:      #ffffff;
+    --bg2:     #f4f3ef;
+    --bg3:     #eae9e3;
+    --text:    #111111;
+    --text2:   #7a7872;
+    --border:  rgba(0,0,0,0.11);
+    --border2: rgba(0,0,0,0.24);
+    --accent:  #cc0000;
+    --font:    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #131312;
+      --bg2:     #1e1e1b;
+      --bg3:     #2b2b27;
+      --text:    #e6e4da;
+      --text2:   #88867e;
+      --border:  rgba(255,255,255,0.09);
+      --border2: rgba(255,255,255,0.22);
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  header { border-bottom: 1px solid var(--border); padding: 52px 24px 44px; text-align: center; }
+  .header-tag  { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+  .header-title { font-size: clamp(30px,5vw,46px); font-weight: 500; letter-spacing: -.025em; line-height: 1.1; margin-bottom: 10px; }
+  .header-authors { font-size: 13px; color: var(--text2); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 22px; }
+  .header-premise { font-size: 15px; color: var(--text2); max-width: 580px; margin: 0 auto; line-height: 1.75; }
+
+  main { max-width: 1080px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .hint { text-align: center; font-size: 11px; color: var(--text2); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 20px; }
+
+  .cols { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+  @media(max-width:720px) { .cols { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+  @media(max-width:400px) { .cols { grid-template-columns: 1fr; } }
+
+  .col-header { background: var(--text); color: var(--bg); padding: 11px 10px; text-align: center; font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; border-radius: 2px; margin-bottom: 8px; cursor: pointer; user-select: none; transition: opacity .15s; }
+  .col-header:hover { opacity: .75; }
+  .col-header.active { box-shadow: 0 0 0 2px var(--text), 0 0 0 4px var(--bg); }
+
+  .concept-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 2px; padding: 9px 11px; margin-bottom: 6px; cursor: pointer; user-select: none; transition: background .13s, border-color .13s; }
+  .concept-card:hover { background: var(--bg3); }
+  .concept-card.active { border-color: var(--border2); background: var(--bg); }
+  .c-name { font-weight: 500; font-size: 13px; }
+  .c-tag  { font-size: 11px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+
+  /* ── Detail panel ── */
+  .detail { border-top: 1px solid var(--border); margin-top: 32px; padding-top: 32px; opacity: 0; transform: translateY(8px); transition: opacity .22s, transform .22s; pointer-events: none; }
+  .detail.on { opacity: 1; transform: none; pointer-events: all; }
+
+  .detail-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+  .detail-col-lbl { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); }
+  .btn-close { background: none; border: 0.5px solid var(--border2); border-radius: 2px; padding: 5px 12px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; color: var(--text2); font-family: var(--font); transition: background .13s; }
+  .btn-close:hover { background: var(--bg2); }
+
+  .detail-name    { font-size: 28px; font-weight: 500; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 5px; }
+  .detail-tagline { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); padding-bottom: 22px; border-bottom: 0.5px solid var(--border); margin-bottom: 22px; }
+
+  .detail-desc { font-size: 14px; line-height: 1.8; color: var(--text); margin-bottom: 24px; }
+
+  /* Graphic area */
+  .detail-graphic { margin: 0 0 28px; border-radius: 2px; overflow: hidden; background: var(--bg2); border: 0.5px solid var(--border); }
+  .detail-graphic svg { display: block; width: 100%; }
+
+  /* Two-column lower section */
+  .detail-lower { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 28px; }
+  @media(max-width:600px) { .detail-lower { grid-template-columns: 1fr; gap: 20px; } }
+
+  .section-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); margin-bottom: 12px; font-weight: 500; }
+
+  /* Key points */
+  .bullet { display: flex; gap: 10px; font-size: 13px; line-height: 1.65; margin-bottom: 8px; }
+  .bullet::before { content: '—'; color: var(--text2); flex-shrink: 0; }
+
+  /* Exercise */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .step  { display: flex; gap: 12px; align-items: flex-start; }
+  .step-num { min-width: 24px; height: 24px; background: var(--text); color: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; margin-top: 1px; }
+  .step-txt { font-size: 13px; line-height: 1.65; }
+
+  /* Bottom nav */
+  .detail-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 28px; padding-top: 20px; border-top: 0.5px solid var(--border); }
+  .dots { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+  .dot  { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); transition: background .15s; }
+  .dot.on { background: var(--text); }
+  .nav-btns { display: flex; gap: 8px; }
+  .btn-nav { background: none; border: 0.5px solid var(--border2); border-radius: 2px; padding: 8px 14px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; color: var(--text); font-family: var(--font); transition: background .13s; }
+  .btn-nav:hover { background: var(--bg2); }
+
+  footer { border-top: 1px solid var(--border); padding: 30px 24px; text-align: center; font-size: 12px; color: var(--text2); line-height: 1.85; }
+  .belief { max-width: 620px; margin: 0 auto 10px; font-size: 14px; color: var(--text); font-style: italic; }
+
+  /* SVG theming helpers */
+  .svg-wrap { padding: 24px; }
+  .svg-wrap svg { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Interactive Concept Map</div>
+  <h1 class="header-title">Designing Your Life</h1>
+  <div class="header-authors">Bill Burnett &amp; Dave Evans</div>
+  <p class="header-premise">Apply design thinking to build a fulfilling life and career. The core insight: there is no single right path — there are many well-designed lives worth living, and you can prototype your way to one.</p>
+</header>
+
+<main>
+  <p class="hint">Click any concept card to read the explanation and exercise ↓</p>
+
+  <svg width="100%" viewBox="0 0 1020 28" style="display:block;overflow:visible;margin-bottom:0;">
+    <line x1="510" y1="0" x2="510" y2="14" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+    <line x1="118" y1="14" x2="902" y2="14" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+    <line x1="118" y1="14" x2="118" y2="28" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+    <line x1="373" y1="14" x2="373" y2="28" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+    <line x1="647" y1="14" x2="647" y2="28" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+    <line x1="902" y1="14" x2="902" y2="28" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+  </svg>
+
+  <div class="cols" id="cols"></div>
+
+  <div class="detail" id="detail">
+    <div class="detail-top">
+      <span class="detail-col-lbl" id="d-col"></span>
+      <button class="btn-close" onclick="closeDetail()">✕ Close</button>
+    </div>
+    <div class="detail-name" id="d-name"></div>
+    <div class="detail-tagline" id="d-tagline"></div>
+    <div class="detail-desc" id="d-desc"></div>
+    <div class="detail-graphic" id="d-graphic" style="display:none;"></div>
+    <div class="detail-lower">
+      <div>
+        <div class="section-lbl" id="d-keylbl"></div>
+        <div id="d-bullets"></div>
+      </div>
+      <div>
+        <div class="section-lbl">The exercise</div>
+        <div class="steps" id="d-steps"></div>
+      </div>
+    </div>
+    <div class="detail-bottom">
+      <div class="dots" id="d-dots"></div>
+      <div class="nav-btns">
+        <button class="btn-nav" id="btn-prev" onclick="nav(-1)">← Prev</button>
+        <button class="btn-nav" id="btn-next" onclick="nav(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p class="belief">"There is no one right life — there are many well-designed lives worth living."</p>
+  <p>Based on <em>Designing Your Life</em> by Bill Burnett &amp; Dave Evans (Knopf, 2016)<br>
+  17 concepts · Click any card to expand · Use ← → arrow keys to navigate</p>
+</footer>
+
+<script>
+/* ── SVG Graphics ─────────────────────────────────────────────── */
+const G = {
+
+'bias-action': `<div class="svg-wrap"><svg viewBox="0 0 400 175" style="max-height:175px;">
+  <defs><marker id="ah" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <!-- Loop arrows -->
+  <path d="M148 62 Q200 20 255 62" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.4" marker-end="url(#ah)"/>
+  <path d="M294 95 Q330 135 272 152" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.4" marker-end="url(#ah)"/>
+  <path d="M130 152 Q68 135 108 95" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.4" marker-end="url(#ah)"/>
+  <!-- Nodes -->
+  <rect x="88" y="46" width="96" height="40" rx="2" fill="currentColor"/>
+  <text x="136" y="71" text-anchor="middle" fill="var(--bg)" font-size="12" font-family="inherit" font-weight="500">IMAGINE</text>
+  <rect x="218" y="46" width="96" height="40" rx="2" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="266" y="71" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit" font-weight="500">TRY</text>
+  <rect x="155" y="128" width="96" height="40" rx="2" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="203" y="153" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit" font-weight="500">NOTICE</text>
+  <!-- Labels on arrows -->
+  <text x="200" y="22" text-anchor="middle" fill="currentColor" opacity="0.4" font-size="10" font-family="inherit">make a prototype</text>
+  <text x="330" y="130" text-anchor="middle" fill="currentColor" opacity="0.4" font-size="10" font-family="inherit">learn</text>
+  <text x="70" y="130" text-anchor="middle" fill="currentColor" opacity="0.4" font-size="10" font-family="inherit">iterate</text>
+</svg></div>`,
+
+'reframing': `<div class="svg-wrap"><svg viewBox="0 0 420 140" style="max-height:140px;">
+  <!-- Left frame: stuck problem -->
+  <rect x="20" y="20" width="160" height="96" rx="2" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+  <text x="100" y="50" text-anchor="middle" fill="currentColor" font-size="11" font-family="inherit" opacity="0.5">STUCK QUESTION</text>
+  <text x="100" y="72" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit">"What should I</text>
+  <text x="100" y="88" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit">do with my life?"</text>
+  <!-- X mark -->
+  <line x1="30" y1="30" x2="50" y2="50" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+  <line x1="50" y1="30" x2="30" y2="50" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+  <!-- Arrow -->
+  <line x1="192" y1="68" x2="238" y2="68" stroke="currentColor" stroke-width="1.2" opacity="0.5" marker-end="url(#ah2)"/>
+  <text x="215" y="60" text-anchor="middle" fill="currentColor" opacity="0.4" font-size="10" font-family="inherit">reframe</text>
+  <defs><marker id="ah2" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <!-- Right frame: reframed -->
+  <rect x="240" y="20" width="160" height="96" rx="2" fill="currentColor" opacity="0.9"/>
+  <text x="320" y="50" text-anchor="middle" fill="var(--bg)" font-size="11" font-family="inherit" opacity="0.7">BETTER QUESTION</text>
+  <text x="320" y="72" text-anchor="middle" fill="var(--bg)" font-size="12" font-family="inherit">"What's interesting</text>
+  <text x="320" y="88" text-anchor="middle" fill="var(--bg)" font-size="12" font-family="inherit">to me right now?"</text>
+</svg></div>`,
+
+'radical-collab': `<div class="svg-wrap"><svg viewBox="0 0 360 200" style="max-height:190px;">
+  <!-- Spokes -->
+  <line x1="180" y1="96" x2="180" y2="38" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <line x1="180" y1="96" x2="310" y2="100" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <line x1="180" y1="96" x2="180" y2="164" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <line x1="180" y1="96" x2="50" y2="100" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <!-- Center -->
+  <circle cx="180" cy="96" r="30" fill="currentColor"/>
+  <text x="180" y="100" text-anchor="middle" fill="var(--bg)" font-size="13" font-family="inherit" font-weight="500">YOU</text>
+  <!-- Outer nodes -->
+  <circle cx="180" cy="24" r="22" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="180" y="28" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">MENTORS</text>
+  <circle cx="322" cy="100" r="28" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="322" y="97" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">FELLOW</text>
+  <text x="322" y="110" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">TRAVELERS</text>
+  <circle cx="180" cy="178" r="28" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="180" y="175" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">SUPPORTERS</text>
+  <text x="180" y="188" text-anchor="middle" fill="currentColor" font-size="9" font-family="inherit" opacity="0.5">unconditional</text>
+  <circle cx="38" cy="100" r="22" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="38" y="104" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">PEERS</text>
+</svg></div>`,
+
+'wplh': `<div class="svg-wrap" style="padding:20px 24px 12px;">
+  <svg id="wplh-svg" viewBox="0 0 400 130" style="max-height:130px;">
+    <defs>
+      <marker id="ah3" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+        <path d="M1 1L7 4L1 7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </marker>
+    </defs>
+    <!-- 4 gauge backgrounds -->
+    <path id="bg-w" d="" fill="none" stroke="currentColor" stroke-width="7" opacity="0.1"/>
+    <path id="bg-p" d="" fill="none" stroke="currentColor" stroke-width="7" opacity="0.1"/>
+    <path id="bg-l" d="" fill="none" stroke="currentColor" stroke-width="7" opacity="0.1"/>
+    <path id="bg-h" d="" fill="none" stroke="currentColor" stroke-width="7" opacity="0.1"/>
+    <!-- Value arcs -->
+    <path id="arc-w" d="" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+    <path id="arc-p" d="" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+    <path id="arc-l" d="" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+    <path id="arc-h" d="" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+    <!-- Value labels -->
+    <text id="val-w" x="50" y="90" text-anchor="middle" fill="currentColor" font-size="18" font-family="inherit" font-weight="500"></text>
+    <text id="val-p" x="150" y="90" text-anchor="middle" fill="currentColor" font-size="18" font-family="inherit" font-weight="500"></text>
+    <text id="val-l" x="250" y="90" text-anchor="middle" fill="currentColor" font-size="18" font-family="inherit" font-weight="500"></text>
+    <text id="val-h" x="350" y="90" text-anchor="middle" fill="currentColor" font-size="18" font-family="inherit" font-weight="500"></text>
+    <!-- Labels -->
+    <text x="50"  y="118" text-anchor="middle" fill="currentColor" opacity="0.5" font-size="10" font-family="inherit" letter-spacing=".08em">WORK</text>
+    <text x="150" y="118" text-anchor="middle" fill="currentColor" opacity="0.5" font-size="10" font-family="inherit" letter-spacing=".08em">PLAY</text>
+    <text x="250" y="118" text-anchor="middle" fill="currentColor" opacity="0.5" font-size="10" font-family="inherit" letter-spacing=".08em">LOVE</text>
+    <text x="350" y="118" text-anchor="middle" fill="currentColor" opacity="0.5" font-size="10" font-family="inherit" letter-spacing=".08em">HEALTH</text>
+  </svg>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px;">
+    <div style="text-align:center;"><label style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);">Work</label><br><input type="range" id="sl-w" min="0" max="10" value="6" style="width:100%;accent-color:var(--text);" oninput="updateWPLH()"></div>
+    <div style="text-align:center;"><label style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);">Play</label><br><input type="range" id="sl-p" min="0" max="10" value="4" style="width:100%;accent-color:var(--text);" oninput="updateWPLH()"></div>
+    <div style="text-align:center;"><label style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);">Love</label><br><input type="range" id="sl-l" min="0" max="10" value="7" style="width:100%;accent-color:var(--text);" oninput="updateWPLH()"></div>
+    <div style="text-align:center;"><label style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);">Health</label><br><input type="range" id="sl-h" min="0" max="10" value="5" style="width:100%;accent-color:var(--text);" oninput="updateWPLH()"></div>
+  </div>
+</div>`,
+
+'good-time': `<div class="svg-wrap"><svg viewBox="0 0 340 210" style="max-height:200px;">
+  <defs><marker id="ah4" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <!-- Axes -->
+  <line x1="45" y1="175" x2="320" y2="175" stroke="currentColor" stroke-width="1" opacity="0.35" marker-end="url(#ah4)"/>
+  <line x1="45" y1="175" x2="45" y2="18" stroke="currentColor" stroke-width="1" opacity="0.35" marker-end="url(#ah4)"/>
+  <!-- Quadrant dividers -->
+  <line x1="183" y1="18" x2="183" y2="175" stroke="currentColor" stroke-width="0.5" opacity="0.15" stroke-dasharray="5 5"/>
+  <line x1="45" y1="97" x2="320" y2="97" stroke="currentColor" stroke-width="0.5" opacity="0.15" stroke-dasharray="5 5"/>
+  <!-- Flow zone highlight -->
+  <rect x="185" y="20" width="132" height="75" fill="currentColor" opacity="0.06" rx="2"/>
+  <!-- Quadrant labels -->
+  <text x="114" y="58" text-anchor="middle" fill="currentColor" opacity="0.35" font-size="11" font-family="inherit">Re-energizing</text>
+  <text x="251" y="52" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit" font-weight="500">Flow Zone</text>
+  <text x="251" y="65" text-anchor="middle" fill="currentColor" opacity="0.45" font-size="10" font-family="inherit">← aim here</text>
+  <text x="114" y="140" text-anchor="middle" fill="currentColor" opacity="0.35" font-size="11" font-family="inherit">Consider cutting</text>
+  <text x="251" y="140" text-anchor="middle" fill="currentColor" opacity="0.35" font-size="11" font-family="inherit">Draining</text>
+  <!-- Axis labels -->
+  <text x="183" y="195" text-anchor="middle" fill="currentColor" opacity="0.4" font-size="10" font-family="inherit" letter-spacing=".06em">ENGAGEMENT →</text>
+  <text x="14" y="97" text-anchor="middle" fill="currentColor" opacity="0.4" font-size="10" font-family="inherit" transform="rotate(-90 14 97)" letter-spacing=".06em">ENERGY →</text>
+  <!-- Example dots (flow zone) -->
+  <circle cx="255" cy="45" r="6" fill="currentColor" opacity="0.65"/>
+  <circle cx="230" cy="60" r="5" fill="currentColor" opacity="0.5"/>
+  <circle cx="275" cy="68" r="7" fill="currentColor" opacity="0.7"/>
+  <!-- Other dots -->
+  <circle cx="108" cy="68" r="4" fill="currentColor" opacity="0.2"/>
+  <circle cx="252" cy="138" r="4" fill="currentColor" opacity="0.2"/>
+  <circle cx="120" cy="148" r="4" fill="currentColor" opacity="0.18"/>
+  <circle cx="80" cy="130" r="4" fill="currentColor" opacity="0.18"/>
+</svg></div>`,
+
+'gravity': `<div class="svg-wrap"><svg viewBox="0 0 380 150" style="max-height:145px;">
+  <!-- Left column: GRAVITY (truly fixed) -->
+  <rect x="20" y="20" width="145" height="112" rx="2" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+  <text x="92" y="42" text-anchor="middle" fill="currentColor" opacity="0.45" font-size="11" font-family="inherit" letter-spacing=".08em">REAL GRAVITY</text>
+  <text x="92" y="63" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit">Laws of physics</text>
+  <text x="92" y="81" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit">Past events</text>
+  <text x="92" y="99" text-anchor="middle" fill="currentColor" font-size="12" font-family="inherit">Others' choices</text>
+  <text x="92" y="118" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" opacity="0.4">cannot be changed</text>
+  <!-- Right column: PREFERENCE (masquerading) -->
+  <rect x="215" y="20" width="145" height="112" rx="2" fill="currentColor" opacity="0.9"/>
+  <text x="287" y="42" text-anchor="middle" fill="var(--bg)" opacity="0.6" font-size="11" font-family="inherit" letter-spacing=".08em">PREFERENCE</text>
+  <text x="287" y="63" text-anchor="middle" fill="var(--bg)" font-size="12" font-family="inherit">"I'm too old"</text>
+  <text x="287" y="81" text-anchor="middle" fill="var(--bg)" font-size="12" font-family="inherit">"I can't afford it"</text>
+  <text x="287" y="99" text-anchor="middle" fill="var(--bg)" font-size="12" font-family="inherit">"It's too late"</text>
+  <text x="287" y="118" text-anchor="middle" fill="var(--bg)" font-size="10" font-family="inherit" opacity="0.6">actually: won't / afraid to</text>
+  <!-- Arrow between -->
+  <text x="190" y="76" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="20" font-family="inherit">≠</text>
+</svg></div>`,
+
+'mind-map': `<div class="svg-wrap"><svg viewBox="0 0 460 240" style="max-height:220px;">
+  <!-- Level 2 → Level 3 lines -->
+  <line x1="90" y1="55" x2="30" y2="28" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <line x1="90" y1="68" x2="26" y2="85" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <line x1="370" y1="55" x2="430" y2="28" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <line x1="370" y1="68" x2="434" y2="85" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <line x1="90" y1="172" x2="26" y2="152" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <line x1="90" y1="185" x2="26" y2="208" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <line x1="370" y1="172" x2="434" y2="152" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <line x1="370" y1="185" x2="434" y2="208" stroke="currentColor" stroke-width="0.8" opacity="0.18"/>
+  <!-- Center → Branch lines -->
+  <line x1="206" y1="108" x2="115" y2="66" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+  <line x1="254" y1="108" x2="348" y2="66" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+  <line x1="206" y1="132" x2="115" y2="174" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+  <line x1="254" y1="132" x2="348" y2="174" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+  <!-- Level 3 nodes -->
+  <circle cx="22" cy="24"  r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="22" cy="88"  r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="438" cy="24" r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="438" cy="88" r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="22" cy="148"  r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="22" cy="212"  r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="438" cy="148" r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="438" cy="212" r="13" fill="var(--bg2)" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+  <!-- Level 2 nodes -->
+  <circle cx="90" cy="62"  r="26" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
+  <text x="90" y="66" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit">connect</text>
+  <circle cx="370" cy="62" r="26" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
+  <text x="370" y="66" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit">related?</text>
+  <circle cx="90" cy="178"  r="26" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
+  <text x="90" y="182" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit">contexts</text>
+  <circle cx="370" cy="178" r="26" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
+  <text x="370" y="182" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit">roles</text>
+  <!-- Center node -->
+  <circle cx="230" cy="120" r="36" fill="currentColor"/>
+  <text x="230" y="116" text-anchor="middle" fill="var(--bg)" font-size="11" font-family="inherit" font-weight="500">your high-</text>
+  <text x="230" y="130" text-anchor="middle" fill="var(--bg)" font-size="11" font-family="inherit" font-weight="500">energy act.</text>
+  <!-- Gen labels -->
+  <text x="230" y="226" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="9" font-family="inherit">Gen 1</text>
+  <text x="90"  y="226" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="9" font-family="inherit">Gen 2</text>
+  <text x="22"  y="226" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="9" font-family="inherit">Gen 3 ← look here for surprises</text>
+  <text x="370" y="226" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="9" font-family="inherit">Gen 2</text>
+</svg></div>`,
+
+'wayfinding': `<div class="svg-wrap"><svg viewBox="0 0 400 140" style="max-height:135px;">
+  <defs><marker id="ah5" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <!-- Winding path (the life journey) -->
+  <path d="M 20 100 C 60 100, 70 50, 110 60 S 165 105, 200 90 S 265 45, 310 65 S 360 95, 390 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.35" marker-end="url(#ah5)"/>
+  <!-- Stars (engagement) -->
+  <polygon points="90,28 93,37 102,37 96,43 98,52 90,46 82,52 84,43 78,37 87,37" fill="currentColor" opacity="0.7"/>
+  <polygon points="210,18 212,25 220,25 214,30 216,37 210,32 204,37 206,30 200,25 208,25" fill="currentColor" opacity="0.5"/>
+  <polygon points="330,22 332,30 341,30 334,35 337,43 330,38 323,43 326,35 319,30 328,30" fill="currentColor" opacity="0.65"/>
+  <!-- Compass labels -->
+  <text x="90"  y="15" text-anchor="middle" fill="currentColor" opacity="0.5" font-size="9" font-family="inherit" letter-spacing=".05em">ENERGY</text>
+  <text x="210" y="12" text-anchor="middle" fill="currentColor" opacity="0.4" font-size="9" font-family="inherit" letter-spacing=".05em">ENERGY</text>
+  <text x="330" y="14" text-anchor="middle" fill="currentColor" opacity="0.5" font-size="9" font-family="inherit" letter-spacing=".05em">ENERGY</text>
+  <!-- Engagement dots on path -->
+  <circle cx="110" cy="60"  r="5" fill="currentColor" opacity="0.45"/>
+  <circle cx="200" cy="90"  r="5" fill="currentColor" opacity="0.45"/>
+  <circle cx="310" cy="65"  r="5" fill="currentColor" opacity="0.45"/>
+  <text x="110" y="78" text-anchor="middle" fill="currentColor" opacity="0.35" font-size="9" font-family="inherit">engaged</text>
+  <text x="200" y="108" text-anchor="middle" fill="currentColor" opacity="0.35" font-size="9" font-family="inherit">engaged</text>
+  <text x="310" y="83" text-anchor="middle" fill="currentColor" opacity="0.35" font-size="9" font-family="inherit">engaged</text>
+  <text x="200" y="130" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="10" font-family="inherit">when both signals align — keep moving in that direction</text>
+</svg></div>`,
+
+'odyssey': `<div class="svg-wrap"><svg viewBox="0 0 440 180" style="max-height:170px;">
+  <defs><marker id="ah6" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <!-- Labels -->
+  <text x="10" y="51"  fill="currentColor" font-size="11" font-family="inherit" font-weight="500" opacity="0.8">A</text>
+  <text x="10" y="98"  fill="currentColor" font-size="11" font-family="inherit" font-weight="500" opacity="0.8">B</text>
+  <text x="10" y="145" fill="currentColor" font-size="11" font-family="inherit" font-weight="500" opacity="0.8">C</text>
+  <text x="25" y="51"  fill="currentColor" font-size="10" font-family="inherit" opacity="0.4">current path</text>
+  <text x="25" y="98"  fill="currentColor" font-size="10" font-family="inherit" opacity="0.4">if A disappeared</text>
+  <text x="25" y="145" fill="currentColor" font-size="10" font-family="inherit" opacity="0.4">wild card</text>
+  <!-- 6 milestone dots per plan -->
+  <!-- Plan A (solid line, filled dots) -->
+  <line x1="155" y1="44" x2="415" y2="44" stroke="currentColor" stroke-width="1.2" opacity="0.4" marker-end="url(#ah6)"/>
+  <circle cx="155" cy="44" r="5" fill="currentColor" opacity="0.6"/><circle cx="206" cy="44" r="5" fill="currentColor" opacity="0.6"/><circle cx="257" cy="44" r="5" fill="currentColor" opacity="0.6"/><circle cx="308" cy="44" r="5" fill="currentColor" opacity="0.6"/><circle cx="359" cy="44" r="5" fill="currentColor" opacity="0.6"/><circle cx="408" cy="44" r="5" fill="currentColor" opacity="0.6"/>
+  <!-- Plan B (dashed line) -->
+  <line x1="155" y1="91" x2="415" y2="91" stroke="currentColor" stroke-width="1.2" opacity="0.4" stroke-dasharray="6 4" marker-end="url(#ah6)"/>
+  <circle cx="155" cy="91" r="5" fill="var(--bg)" stroke="currentColor" stroke-width="1.2" opacity="0.6"/><circle cx="206" cy="91" r="5" fill="var(--bg)" stroke="currentColor" stroke-width="1.2" opacity="0.6"/><circle cx="257" cy="91" r="5" fill="var(--bg)" stroke="currentColor" stroke-width="1.2" opacity="0.6"/><circle cx="308" cy="91" r="5" fill="var(--bg)" stroke="currentColor" stroke-width="1.2" opacity="0.6"/><circle cx="359" cy="91" r="5" fill="var(--bg)" stroke="currentColor" stroke-width="1.2" opacity="0.6"/><circle cx="408" cy="91" r="5" fill="var(--bg)" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+  <!-- Plan C (dotted line, diamond dots) -->
+  <line x1="155" y1="138" x2="415" y2="138" stroke="currentColor" stroke-width="1.2" opacity="0.4" stroke-dasharray="2 5" marker-end="url(#ah6)"/>
+  <polygon points="155,132 161,138 155,144 149,138" fill="currentColor" opacity="0.5"/><polygon points="206,132 212,138 206,144 200,138" fill="currentColor" opacity="0.5"/><polygon points="257,132 263,138 257,144 251,138" fill="currentColor" opacity="0.5"/><polygon points="308,132 314,138 308,144 302,138" fill="currentColor" opacity="0.5"/><polygon points="359,132 365,138 359,144 353,138" fill="currentColor" opacity="0.5"/><polygon points="408,132 414,138 408,144 402,138" fill="currentColor" opacity="0.5"/>
+  <!-- Year markers -->
+  <text x="155" y="170" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="9" font-family="inherit">now</text>
+  <text x="408" y="170" text-anchor="middle" fill="currentColor" opacity="0.3" font-size="9" font-family="inherit">year 5</text>
+  <!-- Rate dimensions -->
+  <text x="430" y="20" text-anchor="end" fill="currentColor" opacity="0.35" font-size="9" font-family="inherit">rate: confidence · engagement · coherence</text>
+</svg></div>`,
+
+'build-team': `<div class="svg-wrap"><svg viewBox="0 0 360 210" style="max-height:200px;">
+  <!-- Spokes -->
+  <line x1="180" y1="104" x2="180" y2="38" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <line x1="180" y1="104" x2="316" y2="104" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <line x1="180" y1="104" x2="180" y2="175" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <line x1="180" y1="104" x2="44" y2="104" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+  <!-- Center -->
+  <circle cx="180" cy="104" r="30" fill="currentColor"/>
+  <text x="180" y="108" text-anchor="middle" fill="var(--bg)" font-size="13" font-family="inherit" font-weight="500">YOU</text>
+  <!-- Mentors (top) -->
+  <circle cx="180" cy="24" r="22" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="180" y="21" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">MENTORS</text>
+  <text x="180" y="33" text-anchor="middle" fill="currentColor" font-size="9" font-family="inherit" opacity="0.5">5-15 yrs ahead</text>
+  <!-- Players (right) -->
+  <circle cx="330" cy="104" r="26" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="330" y="101" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">PLAYERS</text>
+  <text x="330" y="113" text-anchor="middle" fill="currentColor" font-size="9" font-family="inherit" opacity="0.5">peers growing</text>
+  <!-- Supporters (bottom) -->
+  <circle cx="180" cy="188" r="22" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="180" y="185" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">SUPPORTERS</text>
+  <text x="180" y="198" text-anchor="middle" fill="currentColor" font-size="9" font-family="inherit" opacity="0.5">unconditional</text>
+  <!-- Fellow travelers (left) -->
+  <circle cx="30" cy="104" r="26" fill="var(--bg2)" stroke="currentColor" stroke-width="0.8"/>
+  <text x="30" y="98" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">FELLOW</text>
+  <text x="30" y="111" text-anchor="middle" fill="currentColor" font-size="10" font-family="inherit" font-weight="500">TRAVELERS</text>
+</svg></div>`
+
+};
+
+/* ── Data ─────────────────────────────────────────────────────── */
+const DATA = [
+  {
+    title: "Designer Mindset",
+    concepts: [
+      {
+        name: "Curiosity", tagline: "Wonder, not certainty",
+        description: "The cornerstone of all five mindsets. Curiosity means approaching your life as a fascinating puzzle rather than a test you might fail. Instead of asking 'What should I do with my life?' — which triggers anxiety — ask 'What's genuinely interesting to me right now?' This small shift moves you from paralysis into exploration. Curious people treat dead ends as data, not failures.",
+        keyLabel: "How to practice",
+        keyPoints: ["Notice what makes you lean forward in a conversation — that's a signal worth following","Follow interests without needing to justify them first","Ask 'what if?' more often than 'what should?'"],
+        exercise: ["Set a 15-minute timer and write down 5 things you've been curious about this week — no filter, no judgment","Pick the one that feels most alive and ask: what's one small thing I could do to explore this?","Do that one thing before the week is out","Afterward, write one sentence about what you learned or noticed"]
+      },
+      {
+        name: "Bias to action", tagline: "Try before you plan", graphic: 'bias-action',
+        description: "Designers don't spend months planning before building — they make prototypes fast and learn from them. Applied to life: stop deliberating and start doing. A prototype can be one honest conversation, a weekend project, a volunteer shift, or a one-month experiment. Action generates real information that no amount of thinking can produce. The longer you sit still, the more weight the decision accumulates.",
+        keyLabel: "Prototype ideas",
+        keyPoints: ["Ask: what's the smallest version of this I could try in the next 7 days?","Prototypes don't need to succeed — they need to teach you something","A failed prototype is a successful experiment, never a failed life"],
+        exercise: ["Name one decision you've been overthinking for more than two weeks","Ask: what's the cheapest, fastest version of trying this I could design for this week?","Define the prototype (a conversation, a mini project, a shadow day, a trial)","Do it — and afterward write exactly 3 things you learned that you didn't know before"]
+      },
+      {
+        name: "Reframing", tagline: "Redefine the problem first", graphic: 'reframing',
+        description: "Most problems that keep people stuck are wrongly framed. 'I need to find my passion' implies passion is a fixed object waiting to be discovered. Reframe: 'How do I build more engagement in what I'm already doing?' The best reframes dissolve problems entirely. When you're truly stuck, 9 times out of 10 you're answering the wrong question.",
+        keyLabel: "Common reframes",
+        keyPoints: ["'I don't know what I want' → 'What am I curious about right now?'","'I'm stuck' → 'What assumption could I drop?'","'I have to decide now' → 'What prototype would give me better data?'"],
+        exercise: ["Write down a problem you're currently stuck on — in its original stuck form","List 3 assumptions you're making that you haven't examined","Try rewriting the problem statement without each assumption — what changes?","Choose the reframed version that feels most solvable and work from that"]
+      },
+      {
+        name: "Awareness", tagline: "Question your inherited beliefs",
+        description: "Dysfunctional beliefs are assumptions you've absorbed and never examined — 'There's one right answer,' 'I should have this figured out by now,' 'It's too late to change.' These feel like objective facts but they're inherited scripts. Awareness means catching yourself running on autopilot and consciously choosing which scripts to keep.",
+        keyLabel: "Beliefs worth examining",
+        keyPoints: ["'I need to know my passion before I start' — this is almost always backwards","'Successful people had a plan' — almost never true; they navigated","'Work should be separate from who I am' — worth examining carefully"],
+        exercise: ["Write down 3 beliefs you hold about what you 'should' be doing with your life","For each, ask: where did this come from? A parent, school, culture? Do I actually believe it?","Mark each: Keep / Question / Drop","For any you'd drop — write a replacement belief that actually feels true to you today"]
+      },
+      {
+        name: "Radical collab", tagline: "You cannot design alone", graphic: 'radical-collab',
+        description: "Every great designer works in a studio — getting critique, collaborating, and constantly exposing their work to outside perspectives. Life design works the same way. You need people who see your blind spots, who've traveled similar terrain, and who hold you accountable to your own values. Most people try to figure their lives out entirely in their own heads.",
+        keyLabel: "Who you need",
+        keyPoints: ["Mentors: people 5–10 years ahead on a path you're curious about","Peers: fellow travelers building their lives alongside you","Supporters: people who offer unconditional honesty, not just encouragement"],
+        exercise: ["List everyone you currently turn to for life/career thinking","Categorize them: Mentor / Peer / Supporter / Fellow Traveler","Identify the category with the biggest gap","Name one specific person who could fill that role and reach out this week — coffee, call, or voice note"]
+      }
+    ]
+  },
+  {
+    title: "Build a Compass",
+    concepts: [
+      {
+        name: "Workview", tagline: "Your personal philosophy of work",
+        description: "A workview is a short written statement — one to two pages — of your personal philosophy about work. Why do you work? What is work actually for? Is it purely economic, a vehicle for contribution, a calling, a craft? Writing this forces implicit assumptions into the open. When a job starts feeling wrong, a clear workview helps you distinguish a values violation from a rough week.",
+        keyLabel: "Key questions",
+        keyPoints: ["Why do I work beyond the need to earn money?","What relationship do I want between my work and the rest of my life?","What makes work good, meaningful, or worthwhile to me?"],
+        exercise: ["Set aside 30-45 minutes with a blank page — no template, no format","Write continuously for 20 minutes in response to: 'Why do I work? What is work for?'","Read it back and highlight the 2-3 sentences that feel most true","Refine those into a 3-5 sentence workview you could read to a friend","Revisit it once a year and update what's changed"]
+      },
+      {
+        name: "Lifeview", tagline: "Your worldview about existence",
+        description: "Your lifeview is your deeper philosophy: Why are you alive? Is there meaning beyond individual experience? How do you relate to other people? These sound abstract but they govern every decision you make, often invisibly. Crucially, your lifeview and workview must be coherent with each other — most chronic dissatisfaction comes from a silent conflict between the two.",
+        keyLabel: "Key questions",
+        keyPoints: ["Why are you alive — what is the purpose of your existence?","Is there meaning or value beyond your own individual experience?","How do other people fit into your worldview?"],
+        exercise: ["Set aside 30-45 minutes with a blank page","Write continuously in response to: 'Why am I alive? What is the purpose of my existence?'","After writing, place your workview and lifeview side by side","Ask: do they fit together, or is there a conflict? Where?","Any conflict you find is usually the source of life dissatisfaction — that's what to work on"]
+      },
+      {
+        name: "WPLH gauge", tagline: "Work · Play · Love · Health", graphic: 'wplh',
+        description: "A four-dial self-assessment. Work: are you engaged, contributing, growing? Play: do you have genuine lightness and spontaneity? Love: are your important relationships being tended? Health: are you caring for body, mind, spirit? The goal is not all-tens — it's to notice if any dial is critically low. A life can absorb imbalance, but not a chronically empty dial. Use the sliders above to check in right now.",
+        keyLabel: "The four dials",
+        keyPoints: ["Work — engagement, learning, contribution","Play — genuine joy, spontaneity, fun without agenda","Love — giving and receiving, quality of close relationships","Health — physical, emotional, mental, and spiritual wellbeing"],
+        exercise: ["Right now, honestly rate each dial 0–10 (use the sliders above)","Mark the lowest dial — that's your design constraint","Ask: if this dial went from X to X+2, what would I actually be doing differently?","Define one specific, schedulable action that would raise the lowest dial","Put it in your calendar for this week"]
+      },
+      {
+        name: "Good Time Journal", tagline: "Track energy and engagement daily", graphic: 'good-time',
+        description: "For three weeks, log your daily activities and rate each on two dimensions: engagement (how absorbed were you?) and energy (did this fill or drain you?). After three weeks, look for patterns. High engagement + high energy = your flow zone. The most valuable entries are surprises — the tedious task that secretly energized you, the prestigious project that quietly drained you.",
+        keyLabel: "The two axes",
+        keyPoints: ["Engagement: Were you absorbed? Did time pass faster than expected?","Energy: Did you feel more alive afterwards, or quietly depleted?","Surprises are the most valuable data — look for them specifically"],
+        exercise: ["Create a simple log: date · activity · engagement (1-5) · energy (1-5)","Track every significant activity for 3 weeks — work, errands, social, hobbies","At end of week 3, circle all activities that are 4+ on both axes","Look for patterns: what type of work/context/people scores highest?","Ask: what is it about those activities that lit me up, and how could I get more of that?"]
+      }
+    ]
+  },
+  {
+    title: "Get Unstuck",
+    concepts: [
+      {
+        name: "Gravity problems", tagline: "Can't vs. won't", graphic: 'gravity',
+        description: "A gravity problem is a constraint you've labeled immovable — as fixed as the force of gravity. 'I can't change careers because I'm 45.' These feel like physics. But most gravity problems are preferences, fears, or trade-offs dressed up as facts. The diagnostic: would addressing this require a miracle, or just courage and sacrifice? If only courage, it's not gravity.",
+        keyLabel: "The diagnostic",
+        keyPoints: ["Ask: is this truly impossible, or just difficult and costly?","Ask: if the fear disappeared, would this still be impossible?","Real gravity problems must be honestly accepted or directly challenged — there is no third option"],
+        exercise: ["Write down a constraint that feels immovable in your life right now","Ask: 'If a close friend had this same constraint, what would I tell them?'","Ask: 'Is this truly impossible, or is it costly and scary?'","If it's a preference masquerading as gravity: name the actual trade-off out loud. What would you have to give up to change it? That's the real decision."]
+      },
+      {
+        name: "Anchor problems", tagline: "Locked onto one solution",
+        description: "An anchor problem is when you've decided on a specific solution and locked the entire problem to it. 'I need to become partner at this firm.' You've stopped solving the real problem — what you actually need — and are only solving for one outcome. When it doesn't arrive, you're stuck, even though dozens of paths to the same underlying need exist.",
+        keyLabel: "How to un-anchor",
+        keyPoints: ["Name the underlying need — what do you actually need beneath the fixed goal?","Rewrite the problem statement without the specific solution in it","Generate at least 3 other paths to the underlying need"],
+        exercise: ["Write down a goal you've been stuck on for a while","Ask: 'What underlying need does this goal serve?' Write that need in one sentence","Rewrite the problem using that need — not the specific goal — as the target","Generate at least 3 completely different ways to meet that underlying need","Ask yourself: am I ignoring these alternatives, and if so, why honestly?"]
+      },
+      {
+        name: "Mind mapping", tagline: "Follow curiosity three levels deep", graphic: 'mind-map',
+        description: "Choose an activity that scored high on both engagement and energy in your Good Time Journal. Write it in the center of a blank page. Free-associate outward three times, branching from each new node. After three generations, look at the outermost nodes. Something unexpected out there will often resonate strongly. That resonance is pointing to an authentic interest your logical mind would never surface.",
+        keyLabel: "The process",
+        keyPoints: ["1. Start with a high-engagement, high-energy activity in the center","2. Free-associate outward in three generations — suppress all editing","3. Look for surprising resonance at the outer edge — follow it"],
+        exercise: ["Pick one activity from your Good Time Journal that scored 4-5 on both axes","Write it in the center of a blank page in a circle","Set a 5-minute timer: branch outward freely — what does this connect to? What does it involve? What roles? What contexts? No filtering allowed","Branch outward again from each new node — one more generation","Do one final generation. Now look at the outermost nodes","Circle 3 outer nodes that feel most alive and surprising — these are threads worth following with a prototype conversation"]
+      },
+      {
+        name: "Wayfinding", tagline: "Navigate without a complete map", graphic: 'wayfinding',
+        description: "Ancient Polynesian navigators crossed thousands of miles without instruments, using stars, wave patterns, and wind as real-time signals. Life design works the same way. There is no GPS for your future because the destination doesn't fully exist yet. Wayfinding means using your two compass needles — engagement and energy — to take the next right step. You only need enough light for the next move.",
+        keyLabel: "Your two compass needles",
+        keyPoints: ["Engagement: Am I genuinely absorbed, or just going through the motions?","Energy: Does this fill me up, or quietly deplete me?","When both needles align, you are on a good heading — keep moving"],
+        exercise: ["Look at your current week — for each significant activity, rate engagement (1-5) and energy (1-5)","On paper, plot them: engagement on X-axis, energy on Y-axis","Circle the activities in the top-right quadrant","Ask: what conditions, people, topics, or types of work were present in those activities?","That pattern is your compass reading — what does it suggest about your next move?"]
+      }
+    ]
+  },
+  {
+    title: "Design & Build",
+    concepts: [
+      {
+        name: "3 Odyssey Plans", tagline: "Three alternative 5-year lives", graphic: 'odyssey',
+        description: "Write out three genuinely distinct 5-year plans. Plan A: your current path extended. Plan B: what you'd do if Plan A became impossible tomorrow. Plan C: a wild card — a radically different life you'd be slightly embarrassed to admit you want. For each, write a title, 6 key milestones, and rate it on confidence, engagement, and coherence with your lifeview.",
+        keyLabel: "The three plans",
+        keyPoints: ["Plan A — your current trajectory carried forward 5 years","Plan B — an alternative that isn't a retreat or lesser version of A","Plan C — the life you'd be embarrassed to admit you're curious about"],
+        exercise: ["Plan A: Write your current path forward 5 years. Title it. List 6 milestones. Rate: confidence (1-10), engagement (1-10), coherence with lifeview (1-10)","Plan B: If Plan A disappeared tomorrow — what would you do? Same format. This cannot be Plan A with a different title.","Plan C: The wild card life. Write it even if it seems unrealistic. Same format.","Read all three aloud — alone or to a trusted person","Note your gut reaction to each. Which one makes you lean forward? That's data."]
+      },
+      {
+        name: "Prototype convos", tagline: "Talk before you leap",
+        description: "Before making any significant life change, talk to three to five people already living the life you're imagining. Not to get advice — to get data. What does their actual Tuesday look like? What surprised them? What do they wish they'd known? One honest 45-minute conversation beats six months of online research. These conversations also demolish the fantasy version of a career that looks great on paper.",
+        keyLabel: "Questions to ask",
+        keyPoints: ["'What does a typical Tuesday actually look like for you?'","'What surprised you most about this path?'","'What do you wish you had known before starting?'"],
+        exercise: ["Identify a life or career path you're currently curious about","Name 3-5 people living that life — check LinkedIn, ask friends for introductions","Send a request: 'I'm exploring this path and would love 30 minutes of your honest perspective — not advice, just your real experience'","In the conversation: ask about real Tuesdays, surprises, what they'd do differently, who else to talk to","After each conversation: write 3 things that surprised you and update your mental model accordingly"]
+      },
+      {
+        name: "Design interviews", tagline: "Explore others' life paths",
+        description: "A life design interview asks someone to walk you through how they actually built their life — not the CV version, the real one. Focus on: how they got from start to now (almost never a straight line), what they find most meaningful and most draining, and what they'd recommend to someone starting out. These conversations also build your network — people who gave good advice often become mentors.",
+        keyLabel: "Interview structure",
+        keyPoints: ["'How did you actually get here?' — the real path, not the resume version","'What do you love most and find hardest about this work?'","'Who else should I talk to?' — this one question builds your network for you"],
+        exercise: ["Identify someone whose life or career arc genuinely interests you — not perfect, just interesting","Ask for 45 minutes framed as: 'I'd love to hear how you built your career — the real version, not the resume version'","Ask all three interview questions above, then listen deeply — don't rush to your next question","End with: 'Who else do you think I should talk to?' Then follow up with that person","Write a genuine thank-you note referencing something specific they said — this converts a conversation into a relationship"]
+      },
+      {
+        name: "Build your team", tagline: "Your personal life-design board", graphic: 'build-team',
+        description: "Intentionally assemble four types of people: Supporters (unconditional care and honest challenge), Players (peers actively building alongside you), Mentors (5-15 years ahead, navigated similar terrain), and Fellow Travelers (value-aligned people who push your thinking). Most people have supporters but chronically neglect the other three. Be deliberate. Schedule regular touchpoints.",
+        keyLabel: "The four roles",
+        keyPoints: ["Supporters — unconditional love and honest challenge","Players — peers building in parallel, mutual accountability","Mentors — experienced guides who've been where you're going","Fellow travelers — value-aligned people who challenge you productively"],
+        exercise: ["Draw four circles labeled: Supporters · Players · Mentors · Fellow Travelers","Write names in each circle — who currently fills each role?","Identify the emptiest circle","List 2-3 people who could realistically fill that role (may require introductions)","Schedule one connection this week — coffee, call, voice note — to start that relationship","Set a quarterly calendar reminder to revisit this list"]
+      }
+    ]
+  }
+];
+
+/* ── Flatten ───────────────────────────────────────── */
+const ALL = DATA.flatMap((col, ci) => col.concepts.map((c, ii) => ({ ci, ii, col, concept: c })));
+let cur = -1;
+
+/* ── WPLH arc helper ──────────────────────────────── */
+function arcPath(cx, cy, r, value) {
+  if (value <= 0) return '';
+  const a = Math.PI - (value / 10) * Math.PI;
+  const ex = cx + r * Math.cos(a);
+  const ey = cy - r * Math.sin(a);
+  const large = value > 5 ? 1 : 0;
+  return `M ${cx - r} ${cy} A ${r} ${r} 0 ${large} 1 ${ex.toFixed(2)} ${ey.toFixed(2)}`;
+}
+function bgArcPath(cx, cy, r) {
+  return `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
+}
+function updateWPLH() {
+  const keys = ['w','p','l','h'];
+  const cxs  = [50, 150, 250, 350];
+  const cy = 80, r = 44;
+  keys.forEach((k, i) => {
+    const sl  = document.getElementById('sl-' + k);
+    const arc = document.getElementById('arc-' + k);
+    const bg  = document.getElementById('bg-' + k);
+    const val = document.getElementById('val-' + k);
+    if (!sl || !arc) return;
+    const v = +sl.value;
+    bg.setAttribute('d', bgArcPath(cxs[i], cy, r));
+    arc.setAttribute('d', arcPath(cxs[i], cy, r, v));
+    val.textContent = v;
+  });
+}
+
+/* ── Render columns ──────────────────────────────── */
+function renderCols() {
+  const wrap = document.getElementById('cols');
+  DATA.forEach((col, ci) => {
+    const div = document.createElement('div');
+    const hdr = document.createElement('div');
+    hdr.className = 'col-header'; hdr.id = `h-${ci}`;
+    hdr.textContent = col.title;
+    hdr.onclick = () => open(ci, 0);
+    div.appendChild(hdr);
+    col.concepts.forEach((c, ii) => {
+      const card = document.createElement('div');
+      card.className = 'concept-card'; card.id = `c-${ci}-${ii}`;
+      card.innerHTML = `<div class="c-name">${c.name}</div><div class="c-tag">${c.tagline}</div>`;
+      card.onclick = () => open(ci, ii);
+      div.appendChild(card);
+    });
+    wrap.appendChild(div);
+  });
+  // Dots
+  const dotWrap = document.getElementById('d-dots');
+  ALL.forEach((_, i) => {
+    const d = document.createElement('div'); d.className = 'dot'; d.id = `dot-${i}`;
+    dotWrap.appendChild(d);
+  });
+}
+
+/* ── Open detail ─────────────────────────────────── */
+function open(ci, ii) {
+  const idx = ALL.findIndex(e => e.ci === ci && e.ii === ii);
+  if (idx < 0) return;
+  cur = idx;
+  const { concept, col } = ALL[idx];
+
+  document.querySelectorAll('.concept-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.col-header').forEach(h => h.classList.remove('active'));
+  document.getElementById(`c-${ci}-${ii}`)?.classList.add('active');
+  document.getElementById(`h-${ci}`)?.classList.add('active');
+
+  document.getElementById('d-col').textContent     = col.title;
+  document.getElementById('d-name').textContent    = concept.name;
+  document.getElementById('d-tagline').textContent = concept.tagline;
+  document.getElementById('d-desc').textContent    = concept.description;
+  document.getElementById('d-keylbl').textContent  = concept.keyLabel;
+
+  document.getElementById('d-bullets').innerHTML = concept.keyPoints
+    .map(p => `<div class="bullet">${p}</div>`).join('');
+
+  document.getElementById('d-steps').innerHTML = concept.exercise
+    .map((s, i) => `<div class="step"><div class="step-num">${i+1}</div><div class="step-txt">${s}</div></div>`).join('');
+
+  const gWrap = document.getElementById('d-graphic');
+  if (concept.graphic && G[concept.graphic]) {
+    gWrap.innerHTML = G[concept.graphic];
+    gWrap.style.display = '';
+    if (concept.graphic === 'wplh') setTimeout(updateWPLH, 50);
+  } else {
+    gWrap.innerHTML = '';
+    gWrap.style.display = 'none';
+  }
+
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === idx));
+  document.getElementById('btn-prev').style.visibility = idx > 0 ? 'visible' : 'hidden';
+  document.getElementById('btn-next').style.visibility = idx < ALL.length - 1 ? 'visible' : 'hidden';
+
+  const panel = document.getElementById('detail');
+  panel.classList.add('on');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function nav(dir) {
+  const n = cur + dir;
+  if (n >= 0 && n < ALL.length) { const e = ALL[n]; open(e.ci, e.ii); }
+}
+function closeDetail() {
+  document.getElementById('detail').classList.remove('on');
+  document.querySelectorAll('.concept-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.col-header').forEach(h => h.classList.remove('active'));
+  cur = -1;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  nav(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    nav(-1);
+  if (e.key === 'Escape') closeDetail();
+});
+
+renderCols();
+</script>
+</body>
+</html>
